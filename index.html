@@ -1171,8 +1171,8 @@
         </section>
 
         <section class="span-6">
-          <h2>Engagement Profile</h2>
-          <div class="chart-wrap small"><canvas id="engagementProfile"></canvas></div>
+          <h2>Star Rating Distribution</h2>
+          <div class="chart-wrap small"><canvas id="starRatingBar"></canvas></div>
         </section>
         <section class="span-6">
           <h2>Trend Detection</h2>
@@ -1268,39 +1268,33 @@
         }
       });
 
-      const q = getQuantiles(rows);
-      const profileScores = [
-        Math.round(Math.min(100, metrics.rating / q.maxRating * 100)),
-        Math.round(Math.min(100, metrics.problems / q.maxProblems * 100)),
-        Math.round(Math.min(100, metrics.contests / q.maxContests * 100)),
-        Math.round(Math.min(100, metrics.learning / q.maxLearning * 100)),
-        Math.round(Math.min(100, metrics.practice / q.maxPractice * 100))
-      ];
+      const starCounts = [0, 1, 2, 3, 4, 5].map(star =>
+        rows.filter(row => Math.round(row.star) === star).length
+      );
 
-      makeChart("engagementProfile", {
+      makeChart("starRatingBar", {
         type: "bar",
         data: {
-          labels: ["Rating", "Problems", "Contests", "Learning", "Practice"],
+          labels: ["0 Star", "1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"],
           datasets: [{
-            label: "Relative Strength",
-            data: profileScores,
-            backgroundColor: ["#4d8dff", "#22d3ee", "#ffc72c", "#a78bfa", "#3ce0a1"],
+            label: "Students",
+            data: starCounts,
+            backgroundColor: ["#6f809e", "#4d8dff", "#22d3ee", "#ffc72c", "#a78bfa", "#3ce0a1"],
             borderRadius: 12,
-            barThickness: 22
+            barThickness: 28
           }]
         },
         options: {
-          indexAxis: "y",
           plugins: {
             tooltip: {
               callbacks: {
-                label: ctx => `${ctx.dataset.label}: ${ctx.raw}% of selected peer benchmark`
+                label: ctx => `${ctx.raw} student${ctx.raw === 1 ? "" : "s"}`
               }
             }
           },
           scales: {
-            x: { beginAtZero: true, max: 100, ticks: { callback: value => `${value}%` } },
-            y: { grid: { display: false } }
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 } }
           }
         }
       });
